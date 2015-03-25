@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+  http://java.sun.com/xml/ns/j2ee/connector_1_5.xsd" version="1.5">
+
+    <vendor-name>Fishy Business</vendor-name>
+    <eis-type>Test RA</eis-type>
+    <resourceadapter-version>0.1</resourceadapter-version>
+    <resourceadapter id="AcmeResourceAdapter">
+        <resourceadapter-class>org.waastad.jca.acme.lib.adapter.AcmeResourceAdapter</resourceadapter-class>
+        <inbound-resourceadapter>
+            <messageadapter>
+                <messagelistener>
+                    <messagelistener-type>org.waastad.jca.acme.api.AcmeMessageListener</messagelistener-type>
+                    <activationspec>
+                        <activationspec-class>org.waastad.jca.acme.lib.inflow.AcmeActivationSpec</activationspec-class>
+                        <required-config-property>
+                            <config-property-name>hostName</config-property-name>
+                        </required-config-property>
+                        <required-config-property>
+                            <config-property-name>username</config-property-name>
+                        </required-config-property>
+                        <required-config-property>
+                            <config-property-name>password</config-property-name>
+                        </required-config-property>
+
+                        <config-property>
+                            <config-property-name>hostName</config-property-name>
+                            <config-property-type>java.lang.String</config-property-type>
+                            <config-property-value>127.0.0.1</config-property-value>
+                        </config-property>
+
+                        <config-property>
+                            <config-property-name>username</config-property-name>
+                            <config-property-type>java.lang.String</config-property-type>
+                            <config-property-value>username</config-property-value>
+                        </config-property>
+
+                        <config-property>
+                            <config-property-name>password</config-property-name>
+                            <config-property-type>java.lang.String</config-property-type>
+                            <config-property-value>password</config-property-value>
+                        </config-property>
+
+                        <config-property>
+                            <config-property-name>path</config-property-name>
+                            <config-property-type>java.lang.String</config-property-type>
+                            <config-property-value></config-property-value>
+                        </config-property>
+                    </activationspec>
+                </messagelistener>
+            </messageadapter>
+        </inbound-resourceadapter>
+    </resourceadapter>
+</connector>
