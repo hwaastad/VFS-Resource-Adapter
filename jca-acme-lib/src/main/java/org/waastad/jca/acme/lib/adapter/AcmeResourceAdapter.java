@@ -129,12 +129,6 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
 
     }
 
-    /**
-     * This is called when a resource adapter instance is bootstrapped.
-     *
-     * @param ctx A bootstrap context containing references
-     * @throws ResourceAdapterInternalException indicates bootstrap failure.
-     */
     @Override
     public void start(BootstrapContext ctx)
             throws ResourceAdapterInternalException {
@@ -147,10 +141,6 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
 
     }
 
-    /**
-     * This is called when a resource adapter instance is undeployed or during
-     * application server shutdown.
-     */
     @Override
     public void stop() {
         log.info("stop()");
@@ -159,13 +149,6 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
         }
     }
 
-    /**
-     * This method is called by the application server during crash recovery.
-     *
-     * @param specs An array of ActivationSpec JavaBeans
-     * @throws ResourceException generic exception
-     * @return An array of XAResource objects
-     */
     @Override
     public XAResource[] getXAResources(ActivationSpec[] specs)
             throws ResourceException {
@@ -173,36 +156,6 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
         return null;
     }
 
-//    public void sendMessage(Object message) {
-//        log.info("Sedning message.....");
-//        synchronized (this.factoryMap) {
-//            for (AcmeActivationSpec spec : this.factoryMap.keySet()) {
-//                MessageEndpointFactory factory = factoryMap.get(spec);
-//                MessageEndpoint endpoint = null;
-//                try {
-//                    endpoint = (MessageEndpoint) factory.createEndpoint(null);
-//                    try {
-//                        endpoint.beforeDelivery(getMessageEndpointMethod());
-//                        ((AcmeMessageListener) endpoint).onMessage(spec.getFileObject());
-//                    } catch (NoSuchMethodException | ResourceException | FileSystemException e) {
-//                        log.severe("XXXXXX");
-//                    } finally {
-//                        try {
-//                            endpoint.afterDelivery();
-//                        } catch (ResourceException e) {
-//                            log.severe("yyyyyy");
-//                        }
-//                    }
-//                } catch (UnavailableException e) {
-//                    log.severe("asdasdadsadasdasda");
-//                } finally {
-//                    if (null != endpoint) {
-//                        endpoint.release();
-//                    }
-//                }
-//            }
-//        }
-//    }
     Method getMessageEndpointMethod() {
         return this.messageListenerMethod;
     }
