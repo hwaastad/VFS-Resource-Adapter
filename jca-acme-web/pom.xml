@@ -82,8 +82,8 @@
                     <tomeeClassifier>plus</tomeeClassifier>
                     <libs>
                         <lib>org.waastad:jca-acme-api:1.0-SNAPSHOT:jar</lib>
-                        <lib>org.apache.commons:commons-vfs2:2.0</lib>
-                        <lib>com.jcraft:jsch:0.1.51</lib>
+                       <!-- <lib>org.apache.commons:commons-vfs2:2.0</lib>
+                        <lib>com.jcraft:jsch:0.1.51</lib>-->
                     </libs>
                     <apps>
                         <app>org.waastad:jca-acme-ra:${project.version}:rar</app>
