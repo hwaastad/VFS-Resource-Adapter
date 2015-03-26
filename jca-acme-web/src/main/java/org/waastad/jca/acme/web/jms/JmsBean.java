@@ -1,8 +1,11 @@
 package org.waastad.jca.acme.web.jms;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.provider.sftp.SftpFileObject;
 import org.waastad.jca.acme.api.AcmeMessageListener;
 
 @MessageDriven(messageListenerInterface = AcmeMessageListener.class,
@@ -13,13 +16,11 @@ import org.waastad.jca.acme.api.AcmeMessageListener;
             @ActivationConfigProperty(propertyName = "path", propertyValue = "incoming")})
 public class JmsBean implements AcmeMessageListener {
 
+    private static final Logger log = Logger.getLogger(JmsBean.class.getName());
+
     @Override
-    public void onMessage(Object msg) {
-        System.out.println("JmsBean: Got Message");
-        if (msg instanceof FileObject) {
-            FileObject file = (FileObject) msg;
-            System.out.println("JmsBean: Got info about file: " + file.getName().toString());
-        }
+    public void onMessage(String msg) {
+        log.log(Level.INFO, "JmsBean2:Got info about file: {0}", msg);
     }
 
 }

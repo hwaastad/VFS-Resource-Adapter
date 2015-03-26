@@ -36,7 +36,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
             <version>2.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -82,8 +82,8 @@
                     <tomeeClassifier>plus</tomeeClassifier>
                     <libs>
                         <lib>org.waastad:jca-acme-api:1.0-SNAPSHOT:jar</lib>
-                        <lib>org.apache.commons:commons-vfs2:2.0</lib>
-                        <lib>com.jcraft:jsch:0.1.51</lib>
+                       <!-- <lib>org.apache.commons:commons-vfs2:2.0</lib>
+                        <lib>com.jcraft:jsch:0.1.51</lib>-->
                     </libs>
                     <apps>
                         <app>org.waastad:jca-acme-ra:${project.version}:rar</app>
