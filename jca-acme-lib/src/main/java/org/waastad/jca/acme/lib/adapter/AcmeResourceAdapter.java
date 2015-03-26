@@ -93,15 +93,16 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
         activeSpec.validate();
         log.info(String.format("endpointActivation(%s)", activeSpec.toString()));
         try {
-            FileObject fileObject = activeSpec.getFileObject();
+            FileObject fileObject = activeSpec.getFileObject(getClass().getClassLoader());
             synchronized (this.fileActivations) {
                 fileActivations.put(fileObject, activeSpec);
             }
             
             Method endpointMethod
-                    = AcmeMessageListener.class.getMethod("onMessage", new Class[]{Object.class});
+                    = AcmeMessageListener.class.getMethod("onMessage", new Class[]{String.class});
             activeSpec.setMessageEndpoint(endpointFactory, endpointMethod);
-            log.info(String.format("got object: %s", fileObject.getName().toString()));
+            log.info(String.format("Got object: %s", fileObject.getName().toString()));
+            log.info(String.format("Classloader: %s", fileMonitor.getClass().getClassLoader().toString()));
             fileMonitor.addFile(fileObject);
         } catch (FileSystemException | NoSuchMethodException ex) {
             Logger.getLogger(AcmeResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,7 +125,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
                 this.factoryMap.remove(activeSpec);
             }
             synchronized (this.fileActivations) {
-                fileActivations.put(activeSpec.getFileObject(), activeSpec);
+                fileActivations.put(activeSpec.getFileObject(getClass().getClassLoader()), activeSpec);
             }
         } catch (FileSystemException e) {
             log.severe(e.getMessage());
@@ -177,7 +178,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
             if (get == null) {
                 log.severe("Could not find any spec for this...");
             } else {
-                get.sendMessage(fce.getFile());
+                get.sendMessage(fce.getFile().getName().toString());
             }
         }
         
@@ -188,7 +189,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
             if (get == null) {
                 log.severe("Could not find any spec for this...");
             } else {
-                get.sendMessage(fce.getFile());
+                get.sendMessage(fce.getFile().getName().toString());
             }
         }
         
@@ -199,7 +200,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
             if (get == null) {
                 log.severe("Could not find any spec for this...");
             } else {
-                get.sendMessage(fce.getFile());
+                get.sendMessage(fce.getFile().getName().toString());
             }
         }
         

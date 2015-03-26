@@ -16,6 +16,7 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.waastad.jca.acme.api.AcmeMessageListener;
 
 @Activation(messageListeners = {AcmeMessageListener.class})
@@ -81,11 +82,15 @@ public class AcmeActivationSpec implements ActivationSpec {
         this.path = path;
     }
 
-    public FileObject getFileObject() throws FileSystemException {
+    public FileObject getFileObject(ClassLoader loader) throws FileSystemException {
         path = path.replaceFirst("^/+", "");
         String url = String.format("sftp://%s:%s@%s/%s", username, password, hostName, path);
         log.info(String.format("Resolving: %s", url));
-        return VFS.getManager().resolveFile(url);
+        StandardFileSystemManager manager = new StandardFileSystemManager();
+        manager.setClassLoader(loader);
+        manager.init();
+        return manager.resolveFile(url);
+        //return VFS.getManager().resolveFile(url);
     }
 
     public void setFileObject(FileObject fileObject) {
@@ -139,7 +144,7 @@ public class AcmeActivationSpec implements ActivationSpec {
         return "AcmeActivationSpec{" + "hostName=" + hostName + ", username=" + username + ", password=" + password + ", path=" + path + '}';
     }
 
-    public void sendMessage(Object message) {
+    public void sendMessage(String message) {
         log.info("Sedning message.....");
         try {
             MessageEndpoint endpoint = (MessageEndpoint) mef.createEndpoint(null);
