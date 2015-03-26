@@ -15,6 +15,7 @@ import javax.resource.spi.Connector;
 import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
 import javax.transaction.xa.XAResource;
@@ -27,6 +28,7 @@ import org.waastad.jca.acme.api.AcmeMessageListener;
 import org.waastad.jca.acme.lib.inflow.AcmeActivation;
 import org.waastad.jca.acme.lib.inflow.AcmeActivationSpec;
 import org.waastad.jca.acme.lib.listener.VFSWatchingThread;
+import org.waastad.jca.acme.lib.listener.VFSWorker;
 
 /**
  * AcmeResourceAdapter
@@ -56,10 +58,11 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
     private final ConcurrentHashMap<AcmeActivationSpec, MessageEndpointFactory> factoryMap = new ConcurrentHashMap<>();
     private BootstrapContext bootstrapContext = null;
     Method messageListenerMethod = null;
-
-    DefaultFileMonitor fileMonitor;
-    TestRunnableListener fileListener;
-
+    
+    private DefaultFileMonitor fileMonitor;
+    private TestRunnableListener fileListener;
+    private WorkManager workManager;
+    
     WorkManager getWorkManager() {
         return this.bootstrapContext.getWorkManager();
     }
@@ -82,7 +85,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
     @Override
     public void endpointActivation(final MessageEndpointFactory endpointFactory,
             ActivationSpec spec) throws ResourceException {
-
+        
         if (!(spec instanceof AcmeActivationSpec)) {
             throw new ResourceException("invalid activation spec type");
         }
@@ -94,7 +97,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
             synchronized (this.fileActivations) {
                 fileActivations.put(fileObject, activeSpec);
             }
-
+            
             Method endpointMethod
                     = AcmeMessageListener.class.getMethod("onMessage", new Class[]{Object.class});
             activeSpec.setMessageEndpoint(endpointFactory, endpointMethod);
@@ -126,21 +129,26 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
         } catch (FileSystemException e) {
             log.severe(e.getMessage());
         }
-
+        
     }
-
+    
     @Override
     public void start(BootstrapContext ctx)
             throws ResourceAdapterInternalException {
-        log.info("start()");
-        this.bootstrapContext = ctx;
-        fileListener = new TestRunnableListener();
-        fileMonitor = new DefaultFileMonitor(fileListener);
-        new VFSWatchingThread(fileMonitor, this).start();
-
-
+        try {
+            log.info("start()");
+            this.bootstrapContext = ctx;
+            fileListener = new TestRunnableListener();
+            fileMonitor = new DefaultFileMonitor(fileListener);
+            VFSWorker worker = new VFSWorker(fileMonitor);
+            getWorkManager().doWork(worker);
+//            new VFSWatchingThread(fileMonitor, this).start();
+        } catch (WorkException e) {
+            log.severe(String.format("Error: %s", e.getMessage()));
+        }
+        
     }
-
+    
     @Override
     public void stop() {
         log.info("stop()");
@@ -148,20 +156,20 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
             active.stop();
         }
     }
-
+    
     @Override
     public XAResource[] getXAResources(ActivationSpec[] specs)
             throws ResourceException {
         log.info("getXAResources()");
         return null;
     }
-
+    
     Method getMessageEndpointMethod() {
         return this.messageListenerMethod;
     }
-
+    
     class TestRunnableListener implements FileListener {
-
+        
         @Override
         public void fileCreated(FileChangeEvent fce) throws Exception {
             FileObject parent = fce.getFile().getParent();
@@ -172,7 +180,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
                 get.sendMessage(fce.getFile());
             }
         }
-
+        
         @Override
         public void fileDeleted(FileChangeEvent fce) throws Exception {
             FileObject parent = fce.getFile().getParent();
@@ -183,7 +191,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
                 get.sendMessage(fce.getFile());
             }
         }
-
+        
         @Override
         public void fileChanged(FileChangeEvent fce) throws Exception {
             FileObject parent = fce.getFile().getParent();
@@ -194,7 +202,7 @@ public class AcmeResourceAdapter implements ResourceAdapter, Serializable {
                 get.sendMessage(fce.getFile());
             }
         }
-
+        
     }
-
+    
 }
