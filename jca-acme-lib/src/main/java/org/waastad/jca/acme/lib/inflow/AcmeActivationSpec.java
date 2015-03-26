@@ -1,4 +1,3 @@
-
 package org.waastad.jca.acme.lib.inflow;
 
 import java.lang.reflect.Method;
@@ -19,19 +18,15 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.waastad.jca.acme.api.AcmeMessageListener;
 
-
 @Activation(messageListeners = {AcmeMessageListener.class})
 public class AcmeActivationSpec implements ActivationSpec {
 
-
     private static final Logger log = Logger.getLogger(AcmeActivationSpec.class.getName());
-
 
     private ResourceAdapter ra;
 
     private Method endpointMethod = null;
     private MessageEndpointFactory mef = null;
-
 
     @ConfigProperty(defaultValue = "1.2.3.4")
     private String hostName;
@@ -53,7 +48,6 @@ public class AcmeActivationSpec implements ActivationSpec {
     public AcmeActivationSpec() {
 
     }
-
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
@@ -88,6 +82,7 @@ public class AcmeActivationSpec implements ActivationSpec {
     }
 
     public FileObject getFileObject() throws FileSystemException {
+        path = path.replaceFirst("^/+", "");
         String url = String.format("sftp://%s:%s@%s/%s", username, password, hostName, path);
         log.info(String.format("Resolving: %s", url));
         return VFS.getManager().resolveFile(url);
@@ -96,13 +91,6 @@ public class AcmeActivationSpec implements ActivationSpec {
     public void setFileObject(FileObject fileObject) {
         this.fileObject = fileObject;
     }
-
-    public FileObject getRemoteResolver() throws FileSystemException {
-        String url = String.format("sftp://%s:%s@%s/%s", username, password, hostName, path);
-        log.info(String.format("Resolving: %s", url));
-        return VFS.getManager().resolveFile(url);
-    }
-
 
     @Override
     public void validate() throws InvalidPropertyException {
